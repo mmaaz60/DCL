@@ -6,20 +6,21 @@ from transforms import transforms
 from utils.autoaugment import ImageNetPolicy
 
 # pretrained model checkpoints
-pretrained_model = {'resnet50' : './models/pretrained/resnet50-19c8e357.pth',}
+pretrained_model = {'resnet50': './models/pretrained/resnet50-19c8e357.pth', }
+
 
 # transforms dict
 def load_data_transformers(resize_reso=512, crop_reso=448, swap_num=[7, 7]):
     center_resize = 600
     Normalize = transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     data_transforms = {
-       	'swap': transforms.Compose([
+        'swap': transforms.Compose([
             transforms.Randomswap((swap_num[0], swap_num[1])),
         ]),
         'common_aug': transforms.Compose([
             transforms.Resize((resize_reso, resize_reso)),
             transforms.RandomRotation(degrees=15),
-            transforms.RandomCrop((crop_reso,crop_reso)),
+            transforms.RandomCrop((crop_reso, crop_reso)),
             transforms.RandomHorizontalFlip(),
         ]),
         'train_totensor': transforms.Compose([
@@ -89,22 +90,22 @@ class LoadConfig(object):
         # path/image_name cls_num\n
 
         if 'train' in get_list:
-             self.train_anno = pd.read_csv(os.path.join(self.anno_root, 'ct_train.txt'),\
-                                           sep=" ",\
-                                           header=None,\
-                                           names=['ImageName', 'label'])
+            self.train_anno = pd.read_csv(os.path.join(self.anno_root, 'ct_train.txt'),
+                                          sep=" ",
+                                          header=None,
+                                          names=['ImageName', 'label'])
 
         if 'val' in get_list:
-            self.val_anno = pd.read_csv(os.path.join(self.anno_root, 'ct_val.txt'),\
-                                           sep=" ",\
-                                           header=None,\
-                                           names=['ImageName', 'label'])
+            self.val_anno = pd.read_csv(os.path.join(self.anno_root, 'ct_val.txt'),
+                                        sep=" ",
+                                        header=None,
+                                        names=['ImageName', 'label'])
 
         if 'test' in get_list:
-            self.test_anno = pd.read_csv(os.path.join(self.anno_root, 'ct_test.txt'),\
-                                           sep=" ",\
-                                           header=None,\
-                                           names=['ImageName', 'label'])
+            self.test_anno = pd.read_csv(os.path.join(self.anno_root, 'ct_test.txt'),
+                                         sep=" ",
+                                         header=None,
+                                         names=['ImageName', 'label'])
 
         self.swap_num = args.swap_num
 
@@ -127,7 +128,3 @@ class LoadConfig(object):
         self.log_folder = './logs'
         if not os.path.exists(self.log_folder):
             os.mkdir(self.log_folder)
-
-
-
-

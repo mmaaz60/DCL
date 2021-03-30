@@ -9,6 +9,7 @@ from config import pretrained_model
 
 import pdb
 
+
 class MainModel(nn.Module):
     def __init__(self, config):
         super(MainModel, self).__init__()
@@ -43,7 +44,7 @@ class MainModel(nn.Module):
             if config.cls_2:
                 self.classifier_swap = nn.Linear(2048, 2, bias=False)
             if config.cls_2xmul:
-                self.classifier_swap = nn.Linear(2048, 2*self.num_classes, bias=False)
+                self.classifier_swap = nn.Linear(2048, 2 * self.num_classes, bias=False)
             self.Convmask = nn.Conv2d(2048, 1, 1, stride=1, padding=0, bias=True)
             self.avgpool2 = nn.AvgPool2d(2, stride=2)
 

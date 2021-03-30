@@ -10,6 +10,7 @@ from PIL import ImageStat
 
 import pdb
 
+
 def random_sample(img_names, labels):
     anno_dict = {}
     img_list = []
@@ -22,15 +23,15 @@ def random_sample(img_names, labels):
 
     for anno in anno_dict.keys():
         anno_len = len(anno_dict[anno])
-        fetch_keys = random.sample(list(range(anno_len)), anno_len//10)
+        fetch_keys = random.sample(list(range(anno_len)), anno_len // 10)
         img_list.extend([anno_dict[anno][x] for x in fetch_keys])
         anno_list.extend([anno for x in fetch_keys])
     return img_list, anno_list
 
 
-
 class dataset(data.Dataset):
-    def __init__(self, Config, anno, swap_size=[7,7], common_aug=None, swap=None, totensor=None, train=False, train_val=False, test=False):
+    def __init__(self, Config, anno, swap_size=[7, 7], common_aug=None, swap=None, totensor=None, train=False,
+                 train_val=False, test=False):
         self.root_path = Config.rawdata_root
         self.numcls = Config.numcls
         self.dataset = Config.dataset
@@ -61,14 +62,14 @@ class dataset(data.Dataset):
         img = self.pil_loader(img_path)
         if self.test:
             img = self.totensor(img)
-            label = self.labels[item]
+            label = self.labels[item] - 1
             return img, label, self.paths[item]
         img_unswap = self.common_aug(img) if not self.common_aug is None else img
 
         image_unswap_list = self.crop_image(img_unswap, self.swap_size)
 
         swap_range = self.swap_size[0] * self.swap_size[1]
-        swap_law1 = [(i-(swap_range//2))/swap_range for i in range(swap_range)]
+        swap_law1 = [(i - (swap_range // 2)) / swap_range for i in range(swap_range)]
 
         if self.train:
             img_swap = self.swap(img_unswap)
@@ -79,9 +80,9 @@ class dataset(data.Dataset):
             for swap_im in swap_stats:
                 distance = [abs(swap_im - unswap_im) for unswap_im in unswap_stats]
                 index = distance.index(min(distance))
-                swap_law2.append((index-(swap_range//2))/swap_range)
+                swap_law2.append((index - (swap_range // 2)) / swap_range)
             img_swap = self.totensor(img_swap)
-            label = self.labels[item]
+            label = self.labels[item] - 1
             if self.use_cls_mul:
                 label_swap = label + self.numcls
             if self.use_cls_2:
@@ -89,13 +90,13 @@ class dataset(data.Dataset):
             img_unswap = self.totensor(img_unswap)
             return img_unswap, img_swap, label, label_swap, swap_law1, swap_law2, self.paths[item]
         else:
-            label = self.labels[item]
-            swap_law2 = [(i-(swap_range//2))/swap_range for i in range(swap_range)]
+            label = self.labels[item] - 1
+            swap_law2 = [(i - (swap_range // 2)) / swap_range for i in range(swap_range)]
             label_swap = label
             img_unswap = self.totensor(img_unswap)
             return img_unswap, label, label_swap, swap_law1, swap_law2, self.paths[item]
 
-    def pil_loader(self,imgpath):
+    def pil_loader(self, imgpath):
         with open(imgpath, 'rb') as f:
             with Image.open(f) as img:
                 return img.convert('RGB')
@@ -109,7 +110,6 @@ class dataset(data.Dataset):
             for i in range(len(crop_x) - 1):
                 im_list.append(image.crop((crop_x[i], crop_y[j], min(crop_x[i + 1], width), min(crop_y[j + 1], high))))
         return im_list
-
 
     def get_weighted_sampler(self):
         img_nums = len(self.labels)
@@ -139,6 +139,7 @@ def collate_fn4train(batch):
         img_name.append(sample[-1])
     return torch.stack(imgs, 0), label, label_swap, law_swap, img_name
 
+
 def collate_fn4val(batch):
     imgs = []
     label = []
@@ -155,6 +156,7 @@ def collate_fn4val(batch):
         law_swap.append(sample[3])
         img_name.append(sample[-1])
     return torch.stack(imgs, 0), label, label_swap, law_swap, img_name
+
 
 def collate_fn4backbone(batch):
     imgs = []
